@@ -5,6 +5,7 @@ import Error from './Error';
 import useMoneda from '../hooks/useMoneda';
 import useCriptomoneda from '../hooks/useCriptomoneda';
 import axios from 'axios';
+import PropTypes from 'prop-types';
 
 const Boton = styled.input`
   margin-top: 20px;
@@ -79,4 +80,8 @@ const Formulario = ({ guardarMoneda, guardarCriptomoneda }) => {
   );
 };
 
+Formulario.propTypes = {
+  guardarCriptomoneda: PropTypes.func.isRequired,
+  guardarMoneda: PropTypes.func.isRequired,
+};
 export default Formulario;

@@ -1,8 +1,9 @@
-import React, { Fragment, useState } from "react";
-import styled from "@emotion/styled";
+import React, { Fragment, useState } from 'react';
+import styled from '@emotion/styled';
+import PropTypes from 'prop-types';
 
 const Label = styled.label`
-  font-family: "Bebas Neue", cursive;
+  font-family: 'Bebas Neue', cursive;
   color: #fff;
   text-transform: uppercase;
   font-weight: bold;
@@ -27,7 +28,7 @@ const useMoneda = (label, stateInicial, opciones) => {
     <Fragment>
       <Label>{label}</Label>
       <Select onChange={(e) => actualizarState(e.target.value)} value={state}>
-        <option value="">-Seleccione-</option>
+        <option value=''>-Seleccione-</option>
         {opciones.map((opcion) => (
           <option key={opcion.codigo} value={opcion.codigo}>
             {opcion.nombre}
@@ -40,4 +41,9 @@ const useMoneda = (label, stateInicial, opciones) => {
   return [state, Seleccionar, actualizarState];
 };
 
+useMoneda.propTypes = {
+  label: PropTypes.string.isRequired,
+  stateInicial: PropTypes.bool.isRequired,
+  opciones: PropTypes.array.isRequired,
+};
 export default useMoneda;
