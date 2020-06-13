@@ -1,7 +1,10 @@
-import React from "react";
-import styled from "@emotion/styled";
-import imagen from "./cryptomonedas.png";
-import Formulario from "./components/Formulario";
+import React, { useState, useEffect } from 'react';
+import styled from '@emotion/styled';
+import imagen from './cryptomonedas.png';
+import Formulario from './components/Formulario';
+import Cotizacion from './components/Cotizacion';
+import Spinner from './components/Spinner';
+import axios from 'axios';
 
 const Contenedor = styled.div`
   max-width: 900px;
@@ -17,7 +20,7 @@ const Imagen = styled.img`
   margin-top: 5rem;
 `;
 const Heading = styled.h1`
-  font-family: "Bebas Neue", cursive;
+  font-family: 'Bebas Neue', cursive;
   color: #fff;
   text-align: left;
   font-weight: 700;
@@ -25,7 +28,7 @@ const Heading = styled.h1`
   margin-bottom: 50px;
   margin-top: 80px;
   &::after {
-    content: "";
+    content: '';
     width: 100px;
     height: 6px;
     background-color: #66a2f3;
@@ -33,14 +36,41 @@ const Heading = styled.h1`
   }
 `;
 function App() {
+  const [moneda, guardarMoneda] = useState('');
+  const [criptomoneda, guardarCriptomoneda] = useState('');
+  const [resultado, guardarResultado] = useState({});
+  const [cargando, guardarCargando] = useState(false);
+
+  useEffect(() => {
+    const contizarCriptomoneda = async () => {
+      if (moneda === '') return;
+
+      // mostrar el spninner
+      guardarCargando(true);
+      // consultar la api
+      const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${criptomoneda}&tsyms=${moneda}`;
+      const resultado = await axios.get(url);
+
+      setTimeout(() => {
+        guardarCargando(false);
+        guardarResultado(resultado.data.DISPLAY[criptomoneda][moneda]);
+      }, 3000);
+    };
+    contizarCriptomoneda();
+  }, [moneda, criptomoneda]);
+
   return (
     <Contenedor>
       <div>
-        <Imagen src={imagen} alt="imagen cripto" />
+        <Imagen src={imagen} alt='imagen cripto' />
       </div>
       <div>
         <Heading>Cotiza Cryptomonedas al instante</Heading>
-        <Formulario />
+        <Formulario
+          guardarMoneda={guardarMoneda}
+          guardarCriptomoneda={guardarCriptomoneda}
+        />
+        {cargando ? <Spinner /> : <Cotizacion resultado={resultado} />}
       </div>
     </Contenedor>
   );

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
-import styled from "@emotion/styled";
+import React, { useEffect, useState } from 'react';
+import styled from '@emotion/styled';
 
-import useMoneda from "../hooks/useMoneda";
-import useCriptomoneda from "../hooks/useCriptomoneda";
-import axios from "axios";
+import Error from './Error';
+import useMoneda from '../hooks/useMoneda';
+import useCriptomoneda from '../hooks/useCriptomoneda';
+import axios from 'axios';
 
 const Boton = styled.input`
   margin-top: 20px;
@@ -22,23 +23,24 @@ const Boton = styled.input`
   }
 `;
 
-const Formulario = () => {
+const Formulario = ({ guardarMoneda, guardarCriptomoneda }) => {
   // state del listado de criptomonedas
   const [listacripto, guardarCriptomonedas] = useState([]);
+  const [error, guardarError] = useState(false);
   const MONEDAS = [
-    { codigo: "USD", nombre: "Dolar de los Estados Unidos" },
-    { codigo: "MXN", nombre: "Peso Mexicano" },
-    { codigo: "EUR", nombre: "Euro" },
-    { codigo: "GBP", nombre: "Libra Esterlina" },
+    { codigo: 'USD', nombre: 'Dolar de los Estados Unidos' },
+    { codigo: 'MXN', nombre: 'Peso Mexicano' },
+    { codigo: 'EUR', nombre: 'Euro' },
+    { codigo: 'GBP', nombre: 'Libra Esterlina' },
   ];
 
   // Utilizzar useMoneda
-  const [moneda, SelectMoneda] = useMoneda("Elige tu Moneda", "", MONEDAS);
+  const [moneda, SelectMoneda] = useMoneda('Elige tu Moneda', '', MONEDAS);
 
   // Utilizar useCriptomoneda
   const [criptomeneda, SelectCripto] = useCriptomoneda(
-    "Elige tu criptomoneda",
-    "",
+    'Elige tu criptomoneda',
+    '',
     listacripto
   );
 
@@ -46,17 +48,33 @@ const Formulario = () => {
   useEffect(() => {
     const consultarAPI = async () => {
       const url =
-        "https://min-api.cryptocompare.com/data/top/mktcapfull?limit=10&tsym=USD";
+        'https://min-api.cryptocompare.com/data/top/mktcapfull?limit=10&tsym=USD';
       const resultado = await axios.get(url);
       guardarCriptomonedas(resultado.data.Data);
     };
     consultarAPI();
   }, []);
+
+  // Cuando el usario hace submit
+
+  const cotizarMoneda = (e) => {
+    e.preventDefault();
+    // validar si ambos campos esta llenos
+    if (moneda === '' || criptomeneda === '') {
+      guardarError(true);
+      return;
+    }
+    //paser los datos al componente principal
+    guardarError(false);
+    guardarMoneda(moneda);
+    guardarCriptomoneda(criptomeneda);
+  };
   return (
-    <form>
+    <form onSubmit={cotizarMoneda}>
+      {error ? <Error mensaje={'Todos los campos son requeridos'} /> : null}
       <SelectMoneda />
-      <Boton type="submit" value="Calcular" />
       <SelectCripto />
+      <Boton type='submit' value='Calcular' />
     </form>
   );
 };
